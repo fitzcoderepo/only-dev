@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>onlydev</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/static/styles.css" type="text/css" />
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- Header -->
+        <header id="header">
+            <span class="logo">onlydev</span>
+            <div class="divider"></div>
+            <!-- Controls toggle button in header -->
+            <button class="filter-btn" id="btn-controls" onclick="toggleControls()">controls</button>
+            <span id="job-count">— jobs</span>
+            <div class="filters">
+                <input id="company-filter" type="text" placeholder="filter by company..." />
+                <button class="filter-btn" id="btn-new" onclick="toggleFilter('new')">new only</button>
+                <button class="filter-btn" id="btn-remote" onclick="toggleFilter('remote')">remote only</button>
+                <button class="filter-btn" id="btn-unapplied" onclick="toggleFilter('unapplied')">not applied</button>
+            </div>
+        </header>
+
+        <!-- Job List -->
+        <aside id="job-list">
+            <div id="loading">fetching jobs...</div>
+            <div id="list-empty">no jobs match your filters</div>
+        </aside>
+
+        <!-- Job Detail -->
+        <main id="job-detail">
+            <div id="detail-empty">
+                <span class="arrow">←</span>
+                <span>select a job</span>
+            </div>
+            <div id="detail-content">
+                <div class="detail-header">
+                    <div class="detail-company" id="d-company"></div>
+                    <div class="detail-title" id="d-title"></div>
+                    <div class="detail-meta" id="d-meta"></div>
+                    <div class="detail-actions">
+                        <button class="btn btn-primary" id="btn-open" onclick="openJob()">open listing ↗</button>
+                        <button class="btn btn-applied" id="btn-apply" onclick="toggleApplied()">mark applied</button>
+                    </div>
+                    <div class="detail-inline-fields">
+                        <span class="inline-field">location <span id="d-location"></span></span>
+                        <span class="inline-sep">·</span>
+                        <span class="inline-field">department <span id="d-department"></span></span>
+                        <span class="inline-sep">·</span>
+                        <span class="inline-field">office <span id="d-office"></span></span>
+                        <span class="inline-sep">·</span>
+                        <span class="inline-field">first seen <span id="d-first-seen"></span></span>
+                        <span class="inline-sep">·</span>
+                        <span class="inline-field">keywords <span id="d-keywords"></span></span>
+                    </div>
+                </div>
+
+                <div class="detail-body">
+                    <!-- Left: description -->
+                    <div class="detail-left">
+                        <div class="detail-section">
+                            <div class="detail-section-label">description</div>
+                            <div class="detail-description" id="d-description"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: openai actions -->
+                    <div class="detail-right ai-right">
+
+                        <div class="detail-section-label">ai tools</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="btn btn-ai" id="btn-tailor" onclick="startTailor()">tailor resume</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <div id="modal-overlay" onclick="closeModal(event)">
+        <div id="modal">
+            <div id="modal-header">
+                <span id="modal-title">suggestions</span>
+                <button id="modal-close" onclick="closeModal()">close ✕</button>
+            </div>
+            <div id="modal-body">
+                <div id="modal-loading" style="display:none;">thinking...</div>
+                <div id="modal-content"></div>
+                <div id="modal-diffs" style="display:none;">
+                    <div id="diff-sections"></div>
+                    <div class="diff-actions">
+                        <button class="btn btn-primary" id="btn-save-tailor" onclick="applyTailor()">save tailored
+                            resume</button>
+                        <span id="tailor-status"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Controls overlay -->
+    <div id="controls-overlay" onclick="closeControls(event)"></div>
+
+    <!-- Controls panel -->
+    <div id="controls-panel">
+        <div id="controls-header">
+            <span id="controls-title">controls</span>
+            <div class="controls-tabs">
+                <button class="controls-tab active" onclick="switchTab('commands')">commands</button>
+                <button class="controls-tab" onclick="switchTab('settings')">settings</button>
+            </div>
+            <button id="controls-close" onclick="closeControls()">close ✕</button>
+        </div>
+
+        <!-- Commands tab -->
+        <div id="tab-commands" class="controls-body">
+            <div class="control-section-label">commands</div>
+
+            <div class="control-item">
+                <div class="control-info">
+                    <span class="control-name">discover</span>
+                    <span class="control-desc">search github for new job boards</span>
+                </div>
+                <button class="btn control-btn" onclick="runCommand('discover')">run</button>
+            </div>
+
+            <div class="control-item">
+                <div class="control-info">
+                    <span class="control-name">monitor</span>
+                    <span class="control-desc">scan sources and fetch new jobs</span>
+                </div>
+                <button class="btn control-btn" onclick="runCommand('monitor')">run</button>
+            </div>
+
+            <div class="control-item">
+                <div class="control-info">
+                    <span class="control-name">report</span>
+                    <span class="control-desc">print trends and summary</span>
+                </div>
+                <button class="btn control-btn" onclick="runCommand('report')">run</button>
+            </div>
+
+            <div class="control-item">
+                <div class="control-info">
+                    <span class="control-name">run all</span>
+                    <span class="control-desc">discover + monitor + report</span>
+                </div>
+                <button class="btn control-btn" onclick="runCommand('run')">run</button>
+            </div>
+
+            <div class="control-section-label" style="margin-top: 24px;">output</div>
+            <div id="controls-log">
+                <span class="log-placeholder">no output yet</span>
+            </div>
+        </div>
+
+        <!-- Settings tab -->
+        <div id="tab-settings" class="controls-body" style="display:none;">
+
+            <div class="settings-section">
+                <div class="control-section-label">discovery</div>
+                <div class="settings-field">
+                    <label>max pages</label>
+                    <input type="number" id="cfg-discovery-max_pages" min="1" max="30" />
+                </div>
+                <div class="settings-field">
+                    <label>max workers</label>
+                    <input type="number" id="cfg-discovery-max_workers" min="1" max="50" />
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="control-section-label">monitor</div>
+                <div class="settings-field">
+                    <label>max workers</label>
+                    <input type="number" id="cfg-monitor-max_workers" min="1" max="50" />
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="control-section-label">filters</div>
+                <div class="settings-field">
+                    <label>home zip</label>
+                    <input type="text" id="cfg-filters-home_zip" />
+                </div>
+                <div class="settings-field">
+                    <label>keywords</label>
+                    <input type="text" id="cfg-filters-keywords" placeholder="comma separated" />
+                </div>
+                <div class="settings-field">
+                    <label>local cities</label>
+                    <input type="text" id="cfg-filters-local_city_tokens" placeholder="comma separated" />
+                </div>
+                <div class="settings-field">
+                    <label>local states</label>
+                    <input type="text" id="cfg-filters-local_state_tokens" placeholder="comma separated" />
+                </div>
+                <div class="settings-field">
+                    <label>remote tokens</label>
+                    <input type="text" id="cfg-filters-remote_tokens" placeholder="comma separated" />
+                </div>
+                <div class="settings-field">
+                    <label>exclude tokens</label>
+                    <input type="text" id="cfg-filters-exclude_if_not_local_tokens" placeholder="comma separated" />
+                </div>
+                <div class="settings-field">
+                    <label>role tokens</label>
+                    <input type="text" id="cfg-filters-role_tokens" placeholder="comma separated" />
+                </div>
+                <div class="settings-field">
+                    <label>exclude titles</label>
+                    <input type="text" id="cfg-filters-exclude_title_tokens" placeholder="comma separated" />
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="control-section-label">greenhouse ats</div>
+                <div class="settings-field">
+                    <label>engineering tokens</label>
+                    <input type="text" id="cfg-ats-greenhouse_likely_engineering_tokens"
+                        placeholder="comma separated" />
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button class="btn btn-primary" onclick="saveSettings()">save settings</button>
+                <span id="settings-status"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+{
+    "discovery": {
+        "max_pages": 4,
+        "max_workers": 20
+    },
+    "monitor": {
+        "max_workers": 10
+    },
+    "filters": {
+        "keywords": [
+            "python",
+            "django",
+            "next.js",
+            "backend developer",
+            "fullstack developer"
+        ],
+        "home_zip": "37604",
+        "zip_radius_miles": 50,
+        "local_city_tokens": [
+            "johnson city",
+            "kingsport",
+            "bristol",
+            "knoxville"
+        ],
+        "local_state_tokens": [
+            "tn",
+            "tennessee"
+        ],
+        "remote_tokens": [
+            "remote",
+            "work from home",
+            "wfh",
+            "distributed",
+            "anywhere",
+            "usa remote",
+            "us remote",
+            "fully remote",
+            "100% remote"
+        ],
+        "exclude_if_not_local_tokens": [
+            "on-site",
+            "onsite",
+            "in office",
+            "in-office",
+            "hybrid"
+        ],
+        "role_tokens": [
+            "software engineer",
+            "backend",
+            "back-end",
+            "fullstack",
+            "full stack",
+            "developer",
+            "django",
+            "python",
+            "next.js"
+        ],
+        "exclude_title_tokens": [
+            "manager",
+            "intern",
+            "internship",
+            "campus",
+            "university recruiting",
+            "early career",
+            "students"
+        ]
+    },
+    "ats": {
+        "greenhouse": {
+            "likely_engineering_tokens": [
+                "engineer",
+                "developer",
+                "backend",
+                "fullstack",
+                "software"
+            ]
+        }
+    }
+}

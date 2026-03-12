@@ -1,0 +1,23 @@
+[project]
+name = "onlydev"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["requests", "beautifulsoup4", "python-dotenv", "fastapi", "uvicorn", "openai", "python-docx"]
+
+[project.scripts]
+od-discover = "onlydev.cli.discover:main"
+od-monitor  = "onlydev.cli.monitor:main"
+od-report   = "onlydev.cli.report:main"
+od-run      = "onlydev.cli.run:main"
+od-tailor   = "onlydev.cli.run:main"
+
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
